@@ -1,0 +1,149 @@
+---
+title: "Exploratory Data Analysis Coding Exam"
+author: "Yannis L. Valdez"
+date: "2023-10-02"
+output: html_document
+---
+In this dataset of a penguin population in Antarctica, the female population of penguin species will be the focus of the data exploration and analysis. According to Fattorini & Olmastroni (2021), penguins are seabirds whose morphology can determine their sex. They add that generally, male penguins have bigger physical features than female penguins.
+
+Install the following commands using install.packages(). For example, install the ggplot2 package by typing install.packages("ggplot2"). If you already have it installed, load them using the command library().
+```{r setup}
+library(ggplot2)
+library(dplyr)
+library(forcats)
+```
+
+Let R read the dataset file.
+```{r first label}
+penguins <- read.csv("penguins.csv")
+```
+Given that male penguins have larger features such as bills and flippers, it would be interesting to see which species among female penguins have the largest body mass out of the three species included in this study.
+```{r, echo=TRUE}
+custom_colors <- c("pink", "salmon", "hotpink")
+species_order <- unique(penguins$species)
+penguins %>%
+    ggplot(aes(
+        x = fct_reorder(species, body_mass_g, .fun = median),
+        y = body_mass_g,
+        fill = species
+    )) +
+    geom_boxplot() +
+    scale_fill_manual(values = custom_colors, breaks = species_order) +
+    labs(
+        x = "Species",
+        y = "Body Mass (g)",
+        title = "Female Penguin Body Mass Diversity by Species"
+    )
+```
+
+**Figure 1.** Female species diversity in terms of size (Body mass).
+
+## Interpretation
+As seen in the generated graph above, Gentoos have the largest body mass, with a weight ranging from about 4500 to 4800 grams. The second largest body mass belongs to the Chinstrap group equating to 3400 to 3600  grams, and finally, the Adelie female penguins have the smallest body mass which ranges from 3200 to 3500 grams, showing that the total  body mass of Adelie penguins is near that of the Chinstraps.
+
+### Analysis
+Now let’s do a t-test on each of the 3 penguin species: (1) Adelie, (2) Chinstrap, and (3) Gentoo, and if they have a significant effect on the female penguins’ body mass ratio.
+
+1. Code and Result: Adelie and Body Mass
+```{r, echo=TRUE}
+adelie_data <- penguins %>% filter(species == "Adelie")
+t_test_result <- t.test(adelie_data$body_mass_g)
+print(t_test_result)
+```
+
+2. Code and Result: Chinstrap and Body Mass
+```{r, echo=TRUE}
+chinstrap_data <- penguins %>% filter(species == "Chinstrap")
+t_test_result <- t.test(chinstrap_data$body_mass_g)
+print(t_test_result)
+```
+
+3. Code and Result: Gentoo and Body Mass
+```{r, echo=TRUE}
+gentoo_data <- penguins %>% filter(species == "Gentoo")
+t_test_result <- t.test(gentoo_data$body_mass_g)
+print(t_test_result)
+```
+## Interpretation
+Given that the p-values for each female species are less than the significance level of 0.05 (Adelie, Chinstrap, and Gentoo; p-value < 2.2e-16), this means that the difference is statistically significant. Thus, there is enough evidence to say that each female penguin species and their body mass have no difference, which is false (i.e. there are significant differences).
+
+Another important factor to look into is the flipper length of penguins. Louw (1992) reveals that flippers aid in helping penguins move through water and thermoregulation. Davis (2016) also states that penguin the flippers of penguins are short wings and that short wings serve as good flippers for underwater flight. This way, penguins can reduce the drag effect from long wings that other seabirds have; if penguins have shorter flippers, then they can afford to gain more weight (Davis, 2016).
+
+Let’s examine the differences between the penguin flipper length of females across the three islands of interest: Torgersen, Biscoe, and Dream.
+
+```{r, echo=TRUE}
+custom_colors <- c("mediumorchid", "plum4", "magenta4")
+islands_order <- unique(penguins$island)
+penguins %>%
+ggplot(aes(x = fct_reorder(island, flipper_length_mm, .fun = median), y = flipper_length_mm, fill = island)) +
+geom_boxplot() +
+scale_fill_manual(values = custom_colors, breaks = islands_order) +
+labs(
+x = "Islands",
+y = "Flipper Length (mm)",
+title = "Diversity of Female Penguin Flipper Length Across Islands"
+    )
+```
+
+**Figure 2.** Comparison of female species flipper length across islands.
+
+## Interpretation
+The boxplot shows that the female penguins situated in Biscoe have the longest flippers, ranging from 196 to 214 millimeters. Followed by penguins from Biscoe are penguins located in Dream. Penguins living in Dream have a flipper length of 188 to 195 millimeters and finally, penguins in Torgersen have the shortest flipper length, ranging from 186 to 191 millimeters.
+
+Bills of a penguin are extremely important. Yellow-eyed Penguin Trust (2023). State that penguins use their bills to gather food, groom themselves, and defend against predators and other instigators. Thus, bills that are thin and long are ideal (Yellow-eyed Penguin Trust, 2023).
+
+Let’s find out which female penguin species would have the thinnest and longest bill.  Weight of the bill would refer to bill depth whereas bill length pertains to the shortness or longness of the penguin’s bill.
+
+```{r, echo=TRUE}
+ggplot(data = penguins, aes(x = species, group = species)) + geom_point(aes(y = bill_length_mm, color = "Bill Length"),
+size = 3, position = position_dodge(width = 0.3)) + geom_point(aes(y = bill_depth_mm, color = "Bill Depth"), size = 3, position = position_dodge(width = 0.3)) + labs(x = "Penguin Species", y = "Measurement (mm)",
+title = "Bill Length and Depth Diversity in Female Penguin Species"
+    ) + scale_x_discrete(labels = c("Adelie", "Chinstrap", "Gentoo")) +
+    scale_color_manual(
+    values = c("Bill Length" = "cyan4", "Bill Depth" = "hotpink2"),
+    labels = c("Bill Length", "Bill Depth")
+    ) + theme_minimal() + theme(legend.position = "top")
+```
+
+**Figure 3.** Comparison of female species bill length and bill depth.
+
+## Interpretation
+As seen in the graph above, Adelies have a bill length ranging from 15 to 21 millimeters and a bill depth that ranges from 32 to 43 millimeters. Then, Chinstrap penguins have bill lengths that are from 16 to 20 millimeters whereas their bill depth ranges from 41 to 58 millimeters. Finally, Getoos have a bill length of 12 to 16 millimeters and a bill depth of 41 to 51 millimeters. Given these results, this would mean that the Adelie female penguins have both the longest and shortest bills. This would make sense for their behavior as Bales (2023) states that Adelies are strong swimmers.
+
+Moving on, let’s find out which female penguin species on which island has the thickest bill depth.
+
+```{r, echo=TRUE}
+ggplot(data = penguins, aes(x = island, y = bill_depth_mm, fill = island)) +
+    geom_boxplot() +
+    labs(x = "Island", y = "Bill Depth (mm)", title = "Distribution of Female Penguin Bill Depth Across Islands") +
+    scale_x_discrete(labels = c("Torgersen", "Biscoe", "Dream")) +
+    scale_fill_manual(values = c("Torgersen" = "lightskyblue2", "Biscoe" = "cornflowerblue", "Dream" = "dodgerblue")) +
+    theme_minimal() +
+    theme(legend.position = "right")
+```
+
+**Figure 4.** Comparison of female species bill length and bill depth across islands.
+
+## Interpretation
+Female penguins living in Torgersen have the thinnest bill depth (14 to 16.1 millimeters). Then, Bliscoe penguins have a bill depth of 17 to 18.1 millimeters. Finally, Penguins living in Dream have a 17  to 17.9-millimeter beak depth. This would mean that Torgersen female penguins have the best beak used to capture food.
+
+### Acknowledgements
+In analyzing the data and creating plots, ChatGPT helped the author in fixing their codes.
+
+**References**
+
+Bales, R. (2023). Adelie Penguin. AZ Animals. https://a-z-animals.com/animals/adelie-penguin
+
+Collection, P. (n.d.). From wings to flippers. https://teara.govt.nz/en/photograph/6380/from-wings-to-flippers
+
+Fattorini, N., & Olmastroni, S. (2021). Pitfalls and advances in morphometric sexing: insights from the Adélie penguin Pygoscelis adeliae. Polar Biology, 44(8), 1563–1573. https://doi.org/10.1007/s00300-021-02893-6
+
+Louw G. J. (1992). Functional anatomy of the penguin flipper. Journal of the South African Veterinary Association, 63(3), 113–120.
+
+OpenAI. (2023). ChatGPT (Feb 13 version) [Large language model]. https://chat.openai.com
+
+Taylor, C. (2022).  - Brief analysis of Adelie Penguins. (n.d.). https://rpubs.com/CJTA/948742
+
+RPUBS - Palmer Penguin Study. (n.d.). https://rpubs.com/zlzlzl2/737522
+
+Yellow-eyed Penguin Trust. (2023, January 29). Adaptations for life in the sea - Yellow-eyed Penguin Trust. https://www.yellow-eyedpenguin.org.nz/penguins/about-the-yellow-eyed-penguin/adaptations-for-survival
