@@ -1,0 +1,107 @@
+---
+title: "Other Visualization Exercises"
+author: "spideryann"
+date: "2023-10-04"
+output: html_document
+---
+## Hands-on output 1-4
+**HOO1: Why was the previous set of commands executed?**
+
+The row.names command was executed to set universities A to G as observations. As for the univ[1] command, it is set as “null” since there are no values that are equal to 1 according to the data. The as.matrix command was inputted to create the table for the data’s observations and variables. The “subjects” command was needed to set the 8 subjects as the variables for each observation in the heatmap using a vector.
+
+**HOO2: Recreate the heat map using a different color palette. Consult RColorBrewer for the different palettes you can use.**
+
+```{r setup, echo=TRUE}
+library(gplots)
+library(ggplot2)
+library(RColorBrewer)
+```
+
+Load the file containing the dataset using the command below.
+```{r, echo=TRUE}
+univ <- read.csv(file = "university.csv", header = TRUE)
+print(univ)
+```
+
+```{r, echo=TRUE}
+row.names(univ) <-univ$University
+ univ[1] <- NULL
+ univ1 <- as.matrix(univ)
+ subjects <- c("Life Science", "Physical Science", "Health", "IT", "Engineering", "Social Science", "Humanities",
+ "Business")
+```
+The graph below is the same heatmap with a different color palette.
+```{r, echo=TRUE}
+heatmap.2(univ1, col = brewer.pal(6, "RdPu"), trace = "none", 
+Colv = NA, Rowv = NA, density.info = "none", margins = c(7, 5), labCol = subjects)
+```
+
+**HOO3: How did the paper use chord diagrams? What information or data was summarized/visualized through this type of plot?**
+
+The paper uses chord diagrams to exhibit the relationship between studied specimens and non-endoscopic ML applications.  The three apps: (1) GC diagnostics, (2) predicting therapy response, and (3) predicting prognosis. Each plot illustrates the type of specimens or samples that could be examined for the 3 used algorithm applications.
+
+**HOO4: Explain the contents of the dataset and the information they convey.**
+
+As previously mentioned, the dataset covers different non-endoscopic ML methods as the variables (e.g. SVM and LASSO) and the types of samples or specimens (e.g. Histopath, blood) that they can study, in accordance with the categories of interest (diagnostics, prognosis, and therapy response prediction). The dataset indicates that there is potential for non-invasive methods that can be used for diagnosing gastric cancer, such as DL and SVM. DL for example utilized 9 histopath samples, whereas SL is able to make use of multiple samples.
+
+## Exercises 1-4
+
+1. Using the university.csv dataset, create a bar plot to demonstrate that the information conveyed by heat maps can also be conveyed by bar plots. When should you use one over the other?
+
+```{r, echo=TRUE}
+barplot2(univ1, col = brewer.pal(6, "RdPu"), trace = "none", 
+Colv = NA, Rowv = NA, density.info = "none", margins = c(7, 5), labCol = subjects)
+legend("topright", legend = rownames(univ1), fill = brewer.pal(6, "RdPu"),  title = "Legend", x.intersp = 1)
+```
+
+Answer: The heatmap version should be used when quickly visualizing data, for example, the best subjects for a certain university (according to rankings). It is for seeing general differences between the universities. The barplot version is good when you want to specifically see the quantity aspect of the data, for example, the university and which subject their ratings are low and high (i.e. their best or worst subject).
+
+2. Create your own heat map. You can create a hypothetical dataset or download an existing dataset from the internet (cite the source). Show the code and explain the data being visualized.
+
+**Data and steps in creating the heatmap below are from Oliver (2020). Source is listed in the references.**
+```{r, echo=TRUE}
+download.file(url = "https://tinyurl.com/mine-data-csv", destfile = "data/mine-data.csv")
+mine.data <- read.csv(file = "mine-data.csv")
+str(mine.data)
+library(tidyr)
+mine.long <- pivot_longer(data = mine.data, cols = -c(1:3), names_to = "Class", values_to = "Abundance")
+str(mine.long)
+mine.heatmap <- ggplot(data = mine.long, aes(x = Sample.name, y = Class, fill = Abundance)) +
+  geom_tile() +
+  xlab("Sample") +
+  labs(fill = "Abundance")
+mine.heatmap
+```
+The plot above is a heatmap of microbe classes and their abundance in a chrysotile asbestos mine. The sites of interest are situated along the x-axis whereas the classes are situated along the y-axis. The “Abundance” legend displays the abundance of the bacterial class at indicated depths of the sites. From the heatmap patterns, we can see that Actinobacteria dominates the 0.5 to 3.5-meter depth in studied sites and thus were the most abundant (Driscoll, et al., 2016).
+
+3. What are the limitations of chord diagrams?
+
+Limitations of chord diagrams include their difficulty in terms of context in being understood (i.e. low comprehension). Miles (2019) reiterates that chord diagrams are also not made for exploring data in depth.  It is also only suggested to design chord diagrams to show relationships between groups, and so the type of data or field that mostly makes use of chord diagrams is for Biology for species relationships. I noticed that there are very few chord diagrams generated for general topics compared to bar plots.
+
+4. Create your own chord diagram. You can create a hypothetical dataset or download an existing dataset from the internet (cite the source). Show the code and explain the data being visualized.
+
+**The hypothetical dataset was created with the help of ChatGPT, along with the generated code.**
+```{r, echo=TRUE}
+relationships <- data.frame(
+Source = c("Callum", "Rayla", "Ezran", "Soren", "Claudia", "Viren"),
+Target = c("Rayla", "Callum", "Rayla", "Claudia", "Soren", "Ezran"),
+Value = c(3, 2, 1, 2, 3, 1)
+)
+```
+
+```{r, echo=TRUE}
+library(circlize)
+chordDiagramFromDataFrame(relationships)
+```
+
+The above plot is a chord diagram representing the frequency of interactions between characters from a show entitled “The Dragon Prince”. The names in the “Source” and “Target” variables are the characters and correspond to 6 relationships in the chord diagram. The “Value” accounts for how rare or often the two characters interact and the strength of the relationship between them: 1 indicates that the pair rarely interact and have a weaker relationship; 2 suggests the pair has relatively often interactions and a moderately based relationship; and 3 indicates that the pair’s interactions always happen, which suggests that their relationship is a priority in the show’s story (ChatGPT, personal communication, September 29, 2023).
+
+**References**
+
+OpenAI. (2023). ChatGPT (Feb 13 version) [Large language model]. https://chat.openai.com
+
+Driscoll, H. E., Vincent, J. J., English, E. L., & Dolci, E. D. (2016). Metagenomic investigation of the microbial diversity in a chrysotile asbestos mine pit pond, Lowell, Vermont, USA. Genomics Data, 10, 158–164. doi:10.1016/j.gdata.2016.11.004
+
+Miles, C. (2019, March 18). Bring chord diagrams to life with graph visualization. Cambridge Intelligence. https://cambridge-intelligence.com/bringing-chord-diagrams-to-life-with-keylines
+
+Oliver, J. (2020, October 15). Heatmaps in R. GitHub. https://jcoliver.github.io/learn-r/006-heatmaps.html
