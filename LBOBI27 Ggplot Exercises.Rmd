@@ -1,0 +1,60 @@
+---
+title: "Ggplot Exercises"
+author: "spideryann"
+date: "2023-10-04"
+output: html_document
+---
+### Hands-on output 1-3
+**HOO1: Using the same dataset, create a histogram for the variable area, and set the bins to 10.**
+
+Install the "rock" package if you do not have it, including "ggplot" if you haven't already using the command: install.packages(). For example, install.packages("ggplot2")
+```{r, echo=TRUE}
+data("rock")
+library(ggplot2)
+ggplot(data = rock, (aes(x = area))) + geom_histogram(bins = 10) +labs(x = "Area")
+```
+
+**HOO2: Which variable was used as the basis of the grouping?**
+```{r, echo=TRUE}
+data(diamonds)
+ggplot(data = diamonds, aes(x = clarity, y = price, fill = cut))+ geom_bar(position="dodge", stat="identity")
+```
+
+Answer: Cut
+
+### Exercises 1-3
+1. Using the mtcars dataset, is there a significant difference in fuel efficiency based on transmission type?
+```{r, echo=TRUE}
+data(mtcars)
+```
+Note that in the graph below, "0" refers to the automatic transmission type whereas the "1" refers to the manual car transmission mode.
+```{r,echo=TRUE}
+ggplot(mtcars, aes(x = factor(am), y = mpg, fill = factor(am))) +
+  geom_boxplot() +
+  labs(title = "Automatic vs Manual mode based on mpg",
+       x = "Transmission mode",
+       y = "Miles per gallon") +
+  scale_fill_discrete(name = "Transmission type",
+                      labels = c("0" = "Auto", "1" = "Manual")) +
+  theme_minimal()
+```
+
+Answer: Yes, there is a significant difference between fuel efficiency (mpg) based on transmission mode (auto or manual) as the boxplots do not overlap, indicating that there could be a significant difference.
+
+2. Using the InsectSprays dataset, which brand appears to be the most effective?
+```{r, echo=TRUE}
+custom_colors <- c("pink3", "skyblue", "gold", "brown", "darkgreen", "purple3")
+ggplot(data = InsectSprays, aes(x = spray, y = count, fill = spray)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = custom_colors) +
+  labs(x = "Spray brand", y = "Number of insects left alive")
+```
+
+Answer: The most effective spray brand would be Brand C, as after using Brand C, around 25 insects are left alive after using the insect spray. This insect count (of Brand C) has the least number of insects left alive, thus Brand C is the most effective insect spray brand.
+
+3. Using the trees dataset, which of the two variables exhibit a linear relationship?
+```{r, echo=TRUE}
+ggplot(trees, aes(x = Girth, y = Volume, col = Height)) + geom_point() + geom_smooth(method = "lm", se = FALSE) + scale_color_gradient(low = "pink3", high = "purple3") + labs(x = "Girth", y = "Volume")
+```
+
+Answer: The two variables exhibiting a linear relationship would be the Volume and Girth variables, as the graph below shows that as volume increases, girth increases.
